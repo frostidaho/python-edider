@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 from itertools import zip_longest
-from collections import namedtuple
 import string
 import struct
 
@@ -166,24 +165,104 @@ class EDIDParser(EDIDSegmenter):
         return desc.strip()
 
 
-MonInfo = namedtuple('MonInfo', ('mfg', 'year', 'horizontal_size', 'vertical_size', 'descriptor'))
+class BaseScreen(object):
+    def __init__(self, identifier):
+        self._id = identifier
 
-def monitor_info(edid_bytes):
-    edp = EDIDParser(edid_bytes)
-    desc = [edp.descriptor1, edp.descriptor2, edp.descriptor3, edp.descriptor4]
-    desc = [x for x in desc if x]
-    desc = '; '.join(desc)
-    return MonInfo(
-        edp.manufacturer_id,
-        edp.manufacture_year,
-        edp.horizontal_size,
-        edp.vertical_size,
-        desc,
-    )
+    @property
+    def edid(self):
+        try:
+            return self._edid
+        except AttributeError:
+            edid = self._get_output_edid()
+            self._edid = edid
+            return edid
+
+    def _get_output_edid(self):
+        raise NotImplementedError
+
+    def _get_resolution(self):
+        "Set self._width_in_pixels & self._height_in_pixels"
+        raise NotImplementedError
+
+    @property
+    def height_in_pixels(self):
+        try:
+            return self._height_in_pixels
+        except AttributeError:
+            self._get_resolution()
+            return self._height_in_pixels
+
+    @property
+    def width_in_pixels(self):
+        try:
+            return self._width_in_pixels
+        except AttributeError:
+            self._get_resolution()
+            return self._width_in_pixels
+
+    @property
+    def manufacturer_id(self):
+        return EDIDParser(self.edid).manufacturer_id
+
+    @property
+    def manufacture_year(self):
+        return EDIDParser(self.edid).manufacture_year
+
+    @property
+    def width_in_cm(self):
+        return EDIDParser(self.edid).horizontal_size
+
+    @property
+    def height_in_cm(self):
+        return EDIDParser(self.edid).vertical_size
+
+    @property
+    def output_name(self):
+        raise NotImplementedError
+
+    @property
+    def misc(self):
+        edp = EDIDParser(self.edid)
+        desc = [
+            edp.descriptor1,
+            edp.descriptor2,
+            edp.descriptor3,
+            edp.descriptor4,
+        ]
+        desc = [x for x in desc if x]
+        desc = '; '.join(desc)
+        return desc
+
+    def __repr__(self):
+        cname = self.__class__.__name__
+        return cname + '({})'.format(self._id)
+
+    def __str__(self):
+        cname = self.__class__.__name__
+        return cname + '({})'.format(self._id)
+
 
 
 if __name__ == '__main__':
-    import x11read
+    from collections import namedtuple
+    MonInfo = namedtuple('MonInfo', ('mfg', 'year', 'horizontal_size', 'vertical_size', 'descriptor'))
+
+    def monitor_info(edid_bytes):
+        edp = EDIDParser(edid_bytes)
+        desc = [edp.descriptor1, edp.descriptor2, edp.descriptor3, edp.descriptor4]
+        desc = [x for x in desc if x]
+        desc = '; '.join(desc)
+        return MonInfo(
+            edp.manufacturer_id,
+            edp.manufacture_year,
+            edp.horizontal_size,
+            edp.vertical_size,
+            desc,
+        )
+
+    
+    from edider import x11read
     EXAMPL_EDID = x11read.get_output_edid(i_screen=0)
     x = monitor_info(EXAMPL_EDID)
     print(x)

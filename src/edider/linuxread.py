@@ -1,12 +1,5 @@
 from glob import glob
 from os import path
-import os
-# edid_file = '/sys/devices/pci0000:00/0000:00:02.0/drm/card0/card0-VGA-1/edid'
-
-# edid_files = glob('/sys/class/drm/card*/edid')
-# edid_files = glob('/sys/class/drm/card0/*/edid')
-
-
 
 def read_bin(file_path):
     # with open(file_path, mode='rb') as f:
@@ -23,9 +16,10 @@ def get_connected():
         if status == 'connected':
             yield path.dirname(output)
 
-from edider import Screen
-class LinuxScreen(Screen):
+from edider.parser import BaseScreen
+class LinuxScreen(BaseScreen):
     def __init__(self, path):
+        self._id = path
         self._path = path
 
     @property
@@ -36,27 +30,25 @@ class LinuxScreen(Screen):
             self._edid = read_bin(path.join(self._path, 'edid'))
             return self._edid
         
-
-    def _set_resolution(self):
+    def _get_resolution(self):
         with open(path.join(self._path, 'modes'), mode='rt') as modes:
             mode = modes.readline()
-        x,y = mode.split('x')
-        self._width_in_pixels, self._height_in_pixels = x, y
+        x,y = mode.strip().split('x')
+        self._width_in_pixels, self._height_in_pixels = int(x), int(y)
 
-    def __repr__(self):
-        cname = self.__class__.__name__
-        return cname + '({})'.format(self._path)
-
-    def __str__(self):
-        cname = self.__class__.__name__
-        return cname + '({})'.format(self._path)
-
-
-
-
-for output in get_connected():
-    print('Output: ', output)
-    s = LinuxScreen(output)
-    print('\tEDID', s.edid)
+    @property
+    def output_name(self):
+        try:
+            return self._output_name
+        except AttributeError:
+            name = path.basename(self._path)
+            self._output_name = name.split('-', maxsplit=1)[-1]
+            return self._output_name
 
 
+
+if __name__ == '__main__':
+    for output in get_connected():
+        print('Output: ', output)
+        s = LinuxScreen(output)
+        print('\tEDID', s.edid)
