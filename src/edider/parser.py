@@ -166,6 +166,7 @@ class EDIDParser(EDIDSegmenter):
 
 
 class BaseScreen(object):
+    "An abstract class for showing information about connected screens"
     def __init__(self, identifier):
         self._id = identifier
 
