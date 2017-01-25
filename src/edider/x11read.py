@@ -29,6 +29,9 @@ def get_output_edid(i_screen=0):
         edid = bytes(edid.value)
     return edid
 
+def get_screen_resolution(i_screen=0):
+    scr = display.Display().screen(i_screen)
+    return scr.width_in_pixels, scr.height_in_pixels
 
 if __name__ == '__main__':
     for i in range(display.Display().screen_count()):
