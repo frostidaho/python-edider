@@ -2,7 +2,10 @@
 # -*- coding: utf-8 -*-
 import string
 import struct
-from itertools import zip_longest
+try:
+    from itertools import zip_longest
+except ImportError:
+    from itertools import izip_longest as zip_longest
 from collections import namedtuple
 
 
