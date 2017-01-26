@@ -101,7 +101,11 @@ class X11Output:
     @property
     def preferred_mode(self):
         npref = self.info['num_preferred']
-        return self._get_modes()[npref-1]
+        nmode = self.info['modes'][npref-1]
+        print(nmode)
+        modes = [x for x in self.modes if x['id'] == nmode]
+        assert len(modes) == 1, 'There can only be one preferred mode.'
+        return modes[0]
 
     @property
     def current_mode(self):
@@ -111,6 +115,7 @@ class X11Output:
         except KeyError:
             return {}
         modes = [x for x in modes if x['id'] == mode_id]
+        assert len(modes) == 1, 'There can only be one current mode.'
         return modes[0]
 
     def __repr__(self):
@@ -129,7 +134,7 @@ class Monitor(BaseScreen):
         return self._xout.edid
 
     def _dflt_resolution(self):
-        d = self._xout.modes[0]
+        d = self._xout.preferred_mode
         self._width_in_pixels, self._height_in_pixels = d['width'], d['height']
 
     @property
@@ -156,6 +161,3 @@ if __name__ == '__main__':
     monitors = [Monitor(x) for x in get_connected_outputs()]
     for mon in monitors:
         print(mon)
-    # win = get_window()
-    # win = win.__enter__()
-    
