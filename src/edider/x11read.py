@@ -157,6 +157,11 @@ class Monitor(BaseScreen):
             x, y, width, height = 0, 0, 0, 0
         return Geometry(x, y, width, height)
 
+    def __str__(self):
+        sstr = super().__str__()
+        sstr += '\t->\t{}x{}'.format(self.width_in_pixels, self.height_in_pixels)
+        return sstr
+
 if __name__ == '__main__':
     monitors = [Monitor(x) for x in get_connected_outputs()]
     for mon in monitors:
