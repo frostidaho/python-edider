@@ -99,6 +99,11 @@ class X11Output:
             return self._modes
 
     @property
+    def preferred_mode(self):
+        npref = self.info['num_preferred']
+        return self._get_modes()[npref-1]
+
+    @property
     def current_mode(self):
         modes = self._get_modes()
         try:
