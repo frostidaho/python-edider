@@ -6,7 +6,7 @@ from Xlib import X, display, Xatom
 from Xlib.error import XError
 from Xlib.ext import randr
 
-from edider.parser import BaseScreen
+from edider.parser import BaseMonitor
 
 
 Geometry = namedtuple('Geometry', 'x y width height')
@@ -124,7 +124,7 @@ class X11Output:
         return cname + '({})'.format(self.idx)
 
 
-class Monitor(BaseScreen):
+class Monitor(BaseMonitor):
     def __init__(self, index):
         """Index is the X11 index of the output"""
         self._id = index

@@ -173,7 +173,7 @@ class EDIDParser(EDIDSegmenter):
         return desc
 
 
-class BaseScreen(object):
+class BaseMonitor(object):
     "An abstract class for showing information about connected screens"
     def __init__(self, identifier):
         self._id = identifier

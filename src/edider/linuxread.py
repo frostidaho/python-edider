@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from glob import glob
 from os import path
-from edider.parser import BaseScreen
+from edider.parser import BaseMonitor
 
 
 def read_bin(file_path):
@@ -18,7 +18,7 @@ def get_connected():
             yield path.dirname(output)
 
 
-class LinuxScreen(BaseScreen):
+class LinuxScreen(BaseMonitor):
     def __init__(self, path):
         """Path is the file path to a given output.
 
