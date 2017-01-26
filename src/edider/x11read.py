@@ -162,7 +162,13 @@ class Monitor(BaseMonitor):
         sstr += '\t->\t{}x{}'.format(self.width_in_pixels, self.height_in_pixels)
         return sstr
 
+
+def get_monitors():
+    "Return a Monitor instance for each connected computer monitor."
+    return [Monitor(x) for x in get_connected_outputs()]
+
 if __name__ == '__main__':
-    monitors = [Monitor(x) for x in get_connected_outputs()]
+    monitors = get_monitors()
+    # monitors = [Monitor(x) for x in get_connected_outputs()]
     for mon in monitors:
         print(mon)
