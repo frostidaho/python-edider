@@ -128,8 +128,7 @@ class Monitor(BaseScreen):
         self._id = index
         self._xout = X11Output(index)
 
-    @property
-    def edid(self):
+    def _get_output_edid(self):
         return self._xout.edid
 
     def _dflt_resolution(self):
