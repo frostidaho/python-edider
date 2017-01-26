@@ -5,7 +5,7 @@ import struct
 import sys
 try:
     from itertools import zip_longest
-except ImportError:
+except ImportError:             # for python2 compatibility
     from itertools import izip_longest as zip_longest
 from collections import namedtuple
 
@@ -43,7 +43,7 @@ def parse_descriptor(desc):
         return EDIDDescriptor('detailed_timing', None)
     header = struct.unpack('5c', desc[0:5])
     descr_type = header[3][0]
-    if sys.version_info <= (3,0):
+    if sys.version_info <= (3,0): # for python2 compatibility
         descr_type = ord(descr_type)
 
     rest = desc[5:]
@@ -58,6 +58,7 @@ def parse_descriptor(desc):
 
 
 class EDIDSegmenter(object):
+    "Expose the sections of an EDID object as properties of this class."
     def __init__(self, edid_bytes):
         "Pass the EDID as a bytes string"
         self._edid = edid_bytes
