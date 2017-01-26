@@ -271,29 +271,3 @@ class BaseScreen(object):
             rstr += '\t->\t{}'.format(self.name)
         return rstr
 
-
-
-if __name__ == '__main__':
-    from collections import namedtuple
-    MonInfo = namedtuple('MonInfo', ('mfg', 'year', 'horizontal_size', 'vertical_size', 'descriptor'))
-
-    def monitor_info(edid_bytes):
-        edp = EDIDParser(edid_bytes)
-        desc = [edp.descriptor1, edp.descriptor2, edp.descriptor3, edp.descriptor4]
-        desc = [x for x in desc if x]
-        desc = '; '.join(desc)
-        return MonInfo(
-            edp.manufacturer_id,
-            edp.manufacture_year,
-            edp.horizontal_size,
-            edp.vertical_size,
-            desc,
-        )
-
-    
-    from edider import x11read
-    EXAMPL_EDID = x11read.get_output_edid(i_screen=0)
-    x = monitor_info(EXAMPL_EDID)
-    print(x)
-    
-
