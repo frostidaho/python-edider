@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
+from contextlib import contextmanager
+from collections import namedtuple
+
 from Xlib import X, display, Xatom
 from Xlib.error import XError
 from Xlib.ext import randr
+
 from edider.parser import BaseScreen
-from contextlib import contextmanager
-from collections import namedtuple
 
 
 Geometry = namedtuple('Geometry', 'x y width height')

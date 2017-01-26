@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-
-from itertools import zip_longest
 import string
 import struct
+from itertools import zip_longest
 from collections import namedtuple
 
 
