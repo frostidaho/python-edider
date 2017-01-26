@@ -157,23 +157,19 @@ class EDIDParser(EDIDSegmenter):
 
     @property
     def descriptor1(self):
-        desc = parse_descriptor(super().descriptor1)
-        return desc
+        return parse_descriptor(super().descriptor1)
 
     @property
     def descriptor2(self):
-        desc = parse_descriptor(super().descriptor2)
-        return desc
+        return parse_descriptor(super().descriptor2)
 
     @property
     def descriptor3(self):
-        desc = parse_descriptor(super().descriptor3)
-        return desc
+        return parse_descriptor(super().descriptor3)
 
     @property
     def descriptor4(self):
-        desc = parse_descriptor(super().descriptor4)
-        return desc
+        return parse_descriptor(super().descriptor4)
 
 
 class BaseMonitor(object):
