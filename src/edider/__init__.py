@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
 edider is a package which gives access to information about 
 connected computer monitors.
