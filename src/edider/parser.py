@@ -43,6 +43,8 @@ def parse_descriptor(desc):
         return EDIDDescriptor('detailed_timing', None)
     header = struct.unpack('5c', desc[0:5])
     descr_type = header[3][0]
+    if sys.version_info <= (3,0):
+        descr_type = ord(descr_type)
 
     rest = desc[5:]
     try:
