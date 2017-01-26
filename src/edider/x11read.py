@@ -102,7 +102,6 @@ class X11Output:
     def preferred_mode(self):
         npref = self.info['num_preferred']
         nmode = self.info['modes'][npref-1]
-        print(nmode)
         modes = [x for x in self.modes if x['id'] == nmode]
         assert len(modes) == 1, 'There can only be one preferred mode.'
         return modes[0]
