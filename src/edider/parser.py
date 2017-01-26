@@ -51,7 +51,7 @@ def parse_descriptor(desc):
         return EDIDDescriptor(dtype, None)
 
 
-class EDIDSegmenter:
+class EDIDSegmenter(object):
     def __init__(self, edid_bytes):
         "Pass the EDID as a bytes string"
         self._edid = edid_bytes

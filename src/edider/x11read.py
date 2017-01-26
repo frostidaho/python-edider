@@ -40,7 +40,7 @@ def crtc_info(*crtc_idx):
                 info = {}
             yield CRTCInfo(idx, info)
 
-class X11Output:
+class X11Output(object):
     def __init__(self, idx):
         self.idx = idx
 
