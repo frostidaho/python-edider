@@ -138,6 +138,10 @@ class EDIDParser(EDIDSegmenter):
         return 1990 + year
 
     @property
+    def manufacture_week(self):
+        return super().manufacture_week[0]
+
+    @property
     def edid_version(self):
         return super().edid_version[0]
 
