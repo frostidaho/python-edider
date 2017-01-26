@@ -3,6 +3,7 @@
 from itertools import zip_longest
 import string
 import struct
+from collections import namedtuple
 
 def grouper(iterable, n, fillvalue=None):
     "Collect data into fixed-length chunks or blocks"
@@ -15,29 +16,36 @@ def bytes_to_bits(bstr):
 
 def bytes_to_printable(bstr):
     bstr = bstr.decode('ascii', errors='ignore')
-    return ''.join([x for x in bstr if x in string.printable])
+    out = ''.join([x for x in bstr if x in string.printable])
+    return out.strip()
 
+
+EDIDDescriptor = namedtuple('EDIDDescriptor', ('dtype', 'value'))
 def parse_descriptor(desc):
-    # EDID Other Monitor Descriptors
-    # Bytes	Description
-    # 0–1	Zero, indicates not a detailed timing descriptor
-    # 2	Zero
-    # 3	Descriptor type. FA–FF currently defined. 00–0F reserved for vendors.
-    # 4	Zero
-    # 5–17	Defined by descriptor type. If text, code page 437 text
-    GENERAL_TXT = 254
+    # Take a look at the following page
+    # for the descriptor spec
+    # https://en.wikipedia.org/wiki/Extended_Display_Identification_Data
+    dtypes = {
+        255: 'serial_no',
+        254: 'text',
+        253: 'mon_range_lim',
+        252: 'name',
+        251: 'white_pt_data',
+        250: 'std_timing',
+    }
+    text_dtypes = ('serial_no', 'text', 'name')
+
     if desc[0] != 0:
-        return ''
+        return EDIDDescriptor('detailed_timing', None)
     header = struct.unpack('5c', desc[0:5])
     descr_type = header[3][0]
 
     rest = desc[5:]
-    if descr_type == GENERAL_TXT:
-        return bytes_to_printable(rest)
-    print('Unexpected Descriptor type:', f'{descr_type:02X}')
-    print(rest)
-    return bytes_to_printable(rest)
-
+    dtype = dtypes[descr_type]
+    if dtype in text_dtypes:
+        return EDIDDescriptor(dtype, bytes_to_printable(rest))
+    else:
+        return EDIDDescriptor(dtype, None)
 
 
 class EDIDSegmenter:
@@ -147,22 +155,22 @@ class EDIDParser(EDIDSegmenter):
     @property
     def descriptor1(self):
         desc = parse_descriptor(super().descriptor1)
-        return desc.strip()
+        return desc
 
     @property
     def descriptor2(self):
         desc = parse_descriptor(super().descriptor2)
-        return desc.strip()
+        return desc
 
     @property
     def descriptor3(self):
         desc = parse_descriptor(super().descriptor3)
-        return desc.strip()
+        return desc
 
     @property
     def descriptor4(self):
         desc = parse_descriptor(super().descriptor4)
-        return desc.strip()
+        return desc
 
 
 class BaseScreen(object):
@@ -182,7 +190,7 @@ class BaseScreen(object):
     def _get_output_edid(self):
         raise NotImplementedError
 
-    def _get_resolution(self):
+    def _dflt_resolution(self):
         "Set self._width_in_pixels & self._height_in_pixels"
         raise NotImplementedError
 
@@ -191,7 +199,7 @@ class BaseScreen(object):
         try:
             return self._height_in_pixels
         except AttributeError:
-            self._get_resolution()
+            self._dflt_resolution()
             return self._height_in_pixels
 
     @property
@@ -199,7 +207,7 @@ class BaseScreen(object):
         try:
             return self._width_in_pixels
         except AttributeError:
-            self._get_resolution()
+            self._dflt_resolution()
             return self._width_in_pixels
 
     @property
@@ -222,18 +230,35 @@ class BaseScreen(object):
     def output_name(self):
         raise NotImplementedError
 
+    def _get_descriptors(self):
+        try:
+            return self._descriptors
+        except AttributeError:
+            edp = EDIDParser(self.edid)
+            self._descriptors = [
+                edp.descriptor1,
+                edp.descriptor2,
+                edp.descriptor3,
+                edp.descriptor4,
+            ]
+            return self._descriptors
+
     @property
-    def misc(self):
-        edp = EDIDParser(self.edid)
-        desc = [
-            edp.descriptor1,
-            edp.descriptor2,
-            edp.descriptor3,
-            edp.descriptor4,
-        ]
-        desc = [x for x in desc if x]
-        desc = '; '.join(desc)
-        return desc
+    def name(self):
+        desc = self._get_descriptors()
+        try:
+            return [x.value for x in desc if x.dtype == 'name'][0]
+        except IndexError:
+            return ''
+
+    @property
+    def serial_no(self):
+        desc = self._get_descriptors()
+        try:
+            return [x.value for x in desc if x.dtype == 'serial_no'][0]
+        except IndexError:
+            return ''
+
 
     def __repr__(self):
         cname = self.__class__.__name__

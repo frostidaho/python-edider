@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 from Xlib import X, display, Xatom
+from Xlib.error import XError
 from Xlib.ext import randr
 from edider.parser import BaseScreen
 from contextlib import contextmanager
 from collections import namedtuple
 
-OutputInfo = namedtuple('OutputInfo', ('edid', 'name', 'props'))
+# OutputInfo = namedtuple('OutputInfo', ('edid', 'name', 'props'))
 
 @contextmanager
 def get_window(i_screen=0):
@@ -29,7 +30,10 @@ CRTCInfo = namedtuple('CRTCInfo', ('idx', 'info'))
 def crtc_info(*crtc_idx):
     with get_window() as win:
         for idx in crtc_idx:
-            info = randr.get_crtc_info(win, idx, 0)._data
+            try:
+                info = randr.get_crtc_info(win, idx, 0)._data
+            except XError:      # will error if crtc == 0
+                info = {}
             yield CRTCInfo(idx, info)
 
 class X11Output:
@@ -67,7 +71,7 @@ class X11Output:
         return self._info
 
     @property
-    def name(self):
+    def output_name(self):
         return self.info['name']
 
     @property
@@ -87,14 +91,25 @@ class X11Output:
 
     @property
     def modes(self):
-        return self._get_modes()
+        try:
+            return self._modes
+        except AttributeError:
+            self._modes = self._get_modes()
+            return self._modes
 
     @property
-    def mode(self):
+    def current_mode(self):
         modes = self._get_modes()
-        mode_id = self.crtc.info['mode']
+        try:
+            mode_id = self.crtc.info['mode']
+        except KeyError:
+            return {}
         modes = [x for x in modes if x['id'] == mode_id]
         return modes[0]
+
+    def __repr__(self):
+        cname = self.__class__.__name__
+        return cname + '({})'.format(self.idx)
 
 # def get_output_info(*output_ids, i_screen=0):
 #     "Return the raw EDID for a given screen."
@@ -117,29 +132,30 @@ class X11Output:
 #     scr = display.Display().screen(i_screen)
 #     return scr.width_in_pixels, scr.height_in_pixels
 
-# class X11Screen(BaseScreen):
-#     def __init__(self, index=0):
-#         """Index is the X11 index of the screen"""
-#         self._id = index
+class Monitor(BaseScreen):
+    def __init__(self, index):
+        """Index is the X11 index of the output"""
+        self._id = index
+        self._xout = X11Output(index)
 
-#     @property
-#     def edid(self):
-#         try:
-#             return self._edid
-#         except AttributeError:
-#             self._edid = get_output_edid(self._id)
-#             return self._edid
-        
-#     # def _get_resolution(self):
-#     #     x,y = get_screen_resolution(self._id)
-#     #     self._width_in_pixels, self._height_in_pixels = int(x), int(y)
+    @property
+    def edid(self):
+        return self._xout.edid
 
+    def _dflt_resolution(self):
+        d = self._xout.modes[0]
+        self._width_in_pixels, self._height_in_pixels = d['width'], d['height']
+
+    @property
+    def output_name(self):
+        return self._xout.output_name
 
 if __name__ == '__main__':
-    xos = [X11Output(x) for x in get_connected_outputs()]
+    xos = [Monitor(x) for x in get_connected_outputs()]
+    # xos = [X11Output(x) for x in get_connected_outputs()]
     xo = xos[0]
     xo1 = xos[1]
 
-    # win = get_window()
-    # win = win.__enter__()
+    win = get_window()
+    win = win.__enter__()
 
