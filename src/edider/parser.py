@@ -190,6 +190,19 @@ class BaseMonitor(object):
             self._edid = edid
             return edid
 
+    @property
+    def uuid(self):
+        try:
+            return self._uuid
+        except AttributeError:
+            pass
+        import hashlib
+        import uuid
+        md5 = hashlib.md5(self.edid).hexdigest()
+        self._uuid = uuid.UUID(hex=md5)
+        return self._uuid
+        
+
     def _get_output_edid(self):
         raise NotImplementedError
 
