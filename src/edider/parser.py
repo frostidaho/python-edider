@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import string
 import struct
+import sys
 try:
     from itertools import zip_longest
 except ImportError:
@@ -59,8 +60,12 @@ class EDIDSegmenter(object):
         "Pass the EDID as a bytes string"
         self._edid = edid_bytes
 
-    def _get_bytes(self, offset, length):
-        return self._edid[offset : offset+length]
+    if sys.version_info >= (3,0):
+        def _get_bytes(self, offset, length):
+            return self._edid[offset : offset+length]
+    else:
+        def _get_bytes(self, offset, length):
+            return bytearray(self._edid[offset : offset+length])
 
     @property
     def fixed_header(self):
@@ -127,7 +132,7 @@ class EDIDParser(EDIDSegmenter):
     @property
     def manufacturer_id(self):
         alphabet = ' abcdefghijklmnopqrstuvwxyz'
-        mid = super().manufacturer_id
+        mid = super(EDIDParser, self).manufacturer_id
         bits = _bytes_to_bits(mid)
         bits = ''.join(bits)
         bits = bits[1:]         # remove header zero
@@ -137,46 +142,46 @@ class EDIDParser(EDIDSegmenter):
 
     @property
     def manufacture_year(self):
-        year = super().manufacture_year[0]
+        year = super(EDIDParser, self).manufacture_year[0]
         return 1990 + year
 
     @property
     def manufacture_week(self):
-        return super().manufacture_week[0]
+        return super(EDIDParser, self).manufacture_week[0]
 
     @property
     def edid_version(self):
-        return super().edid_version[0]
+        return super(EDIDParser, self).edid_version[0]
 
     @property
     def edid_revision(self):
-        return super().edid_revision[0]
+        return super(EDIDParser, self).edid_revision[0]
 
     @property
     def horizontal_size(self):
         "Horizontal size in cm"
-        return super().horizontal_size[0]
+        return super(EDIDParser, self).horizontal_size[0]
 
     @property
     def vertical_size(self):
         "Vertical size in cm"
-        return super().vertical_size[0]
+        return super(EDIDParser, self).vertical_size[0]
 
     @property
     def descriptor1(self):
-        return parse_descriptor(super().descriptor1)
+        return parse_descriptor(super(EDIDParser, self).descriptor1)
 
     @property
     def descriptor2(self):
-        return parse_descriptor(super().descriptor2)
+        return parse_descriptor(super(EDIDParser, self).descriptor2)
 
     @property
     def descriptor3(self):
-        return parse_descriptor(super().descriptor3)
+        return parse_descriptor(super(EDIDParser, self).descriptor3)
 
     @property
     def descriptor4(self):
-        return parse_descriptor(super().descriptor4)
+        return parse_descriptor(super(EDIDParser, self).descriptor4)
 
 
 class BaseMonitor(object):
