@@ -262,6 +262,14 @@ class BaseMonitor(object):
         except IndexError:
             return ''
 
+    @property
+    def text(self):
+        desc = self._get_descriptors()
+        try:
+            return '; '.join([x.value for x in desc if x.dtype == 'text'])
+        except IndexError:
+            return ''
+
 
     def __repr__(self):
         cname = self.__class__.__name__
