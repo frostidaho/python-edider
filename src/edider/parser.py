@@ -116,7 +116,7 @@ class EDIDSegmenter:
 
     def __repr__(self):
         cname = self.__class__.__name__
-        return f'{cname}({self._edid!r})'
+        return '{}({!r})'.format(cname, self._edid)
     
 
 class EDIDParser(EDIDSegmenter):
