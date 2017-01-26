@@ -7,6 +7,8 @@ from contextlib import contextmanager
 from collections import namedtuple
 
 
+Geometry = namedtuple('Geometry', 'x y width height')
+
 @contextmanager
 def get_window(i_screen=0):
     "Create & manage a x-window."
@@ -129,12 +131,26 @@ class Monitor(BaseScreen):
     def output_name(self):
         return self._xout.output_name
 
+    @property
+    def status(self):
+        crtc = self._xout.crtc
+        if crtc.idx == 0:
+            return 'off'
+        return 'on'
+
+    @property
+    def geometry(self):
+        d = self._xout.crtc.info
+        try:
+            x, y, width, height = d['x'], d['y'], d['width'], d['height']
+        except KeyError:
+            x, y, width, height = 0, 0, 0, 0
+        return Geometry(x, y, width, height)
+
 if __name__ == '__main__':
-    xos = [Monitor(x) for x in get_connected_outputs()]
-    # xos = [X11Output(x) for x in get_connected_outputs()]
-    xo = xos[0]
-    xo1 = xos[1]
-
-    win = get_window()
-    win = win.__enter__()
-
+    monitors = [Monitor(x) for x in get_connected_outputs()]
+    for mon in monitors:
+        print(mon)
+    # win = get_window()
+    # win = win.__enter__()
+    

@@ -5,6 +5,7 @@ import string
 import struct
 from collections import namedtuple
 
+
 def grouper(iterable, n, fillvalue=None):
     "Collect data into fixed-length chunks or blocks"
     # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx"
@@ -265,8 +266,10 @@ class BaseScreen(object):
         return cname + '({})'.format(self._id)
 
     def __str__(self):
-        cname = self.__class__.__name__
-        return cname + '({})'.format(self._id)
+        rstr = repr(self)
+        if self.name:
+            rstr += '\t->\t{}'.format(self.name)
+        return rstr
 
 
 
