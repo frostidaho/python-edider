@@ -5,16 +5,15 @@ from itertools import zip_longest
 from collections import namedtuple
 
 
-def grouper(iterable, n, fillvalue=None):
+def _grouper(iterable, n, fillvalue=None):
     "Collect data into fixed-length chunks or blocks"
-    # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx"
     args = [iter(iterable)] * n
     return zip_longest(*args, fillvalue=fillvalue)
 
-def bytes_to_bits(bstr):
+def _bytes_to_bits(bstr):
     return ['{:08b}'.format(x) for x in bstr]
 
-def bytes_to_printable(bstr):
+def _bytes_to_printable(bstr):
     bstr = bstr.decode('ascii', errors='ignore')
     out = ''.join([x for x in bstr if x in string.printable])
     return out.strip()
@@ -46,7 +45,7 @@ def parse_descriptor(desc):
     except KeyError:
         dtype = '{}'.format(descr_type)
     if dtype in text_dtypes:
-        return EDIDDescriptor(dtype, bytes_to_printable(rest))
+        return EDIDDescriptor(dtype, _bytes_to_printable(rest))
     else:
         return EDIDDescriptor(dtype, None)
 
@@ -125,10 +124,10 @@ class EDIDParser(EDIDSegmenter):
     def manufacturer_id(self):
         alphabet = ' abcdefghijklmnopqrstuvwxyz'
         mid = super().manufacturer_id
-        bits = bytes_to_bits(mid)
+        bits = _bytes_to_bits(mid)
         bits = ''.join(bits)
         bits = bits[1:]         # remove header zero
-        letters = [int(''.join(x), 2) for x in grouper(bits, 5)]
+        letters = [int(''.join(x), 2) for x in _grouper(bits, 5)]
         letters = [alphabet[i] for i in letters]
         return ''.join(letters).upper()
 
