@@ -41,7 +41,10 @@ def parse_descriptor(desc):
     descr_type = header[3][0]
 
     rest = desc[5:]
-    dtype = dtypes[descr_type]
+    try:
+        dtype = dtypes[descr_type]
+    except KeyError:
+        dtype = '{}'.format(descr_type)
     if dtype in text_dtypes:
         return EDIDDescriptor(dtype, bytes_to_printable(rest))
     else:
