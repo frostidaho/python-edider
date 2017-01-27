@@ -65,6 +65,11 @@ class X11Output(object):
         return self._edid
 
     @property
+    def idx_primary(self):
+        with get_window(0) as window:
+            return randr.get_output_primary(window).output
+
+    @property
     def info(self):
         try:
             return self._info
@@ -141,6 +146,11 @@ class Monitor(BaseMonitor):
     @property
     def output_name(self):
         return self._xout.output_name
+
+    @property
+    def is_primary(self):
+        xo = self._xout
+        return xo.idx == xo.idx_primary
 
     @property
     def x11_output_id(self):
