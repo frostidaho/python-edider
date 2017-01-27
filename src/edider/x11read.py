@@ -8,7 +8,7 @@ from Xlib.error import XError
 from Xlib.ext import randr
 
 from edider.parser import BaseMonitor
-
+from builtins import bytes      # needed for python2 compatibility
 
 Geometry = namedtuple('Geometry', 'x y width height')
 

@@ -1,7 +1,8 @@
+# -*- coding: utf-8 -*-
 import os
 import unittest
 from edider.parser import (EDIDSegmenter, EDIDParser)
-
+from builtins import bytes
 try:
     testdir = os.path.dirname(os.path.abspath(__file__))
 except NameError:
@@ -10,7 +11,7 @@ except NameError:
 def get_example_edid(name):
     path = os.path.join(testdir, 'data', name)
     with open(path, mode='rb') as edid_bin:
-        return edid_bin.read()
+        return bytes(edid_bin.read())
 
 class TestSegmenter(unittest.TestCase):
     def test_header(self):

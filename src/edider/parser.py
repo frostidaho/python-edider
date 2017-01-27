@@ -8,7 +8,7 @@ try:
 except ImportError:             # for python2 compatibility
     from itertools import izip_longest as zip_longest
 from collections import namedtuple
-
+from builtins import bytes
 
 def _grouper(iterable, n, fillvalue=None):
     "Collect data into fixed-length chunks or blocks"
@@ -63,12 +63,8 @@ class EDIDSegmenter(object):
         "Pass the EDID as a bytes string"
         self._edid = edid_bytes
 
-    if sys.version_info >= (3,0):
-        def _get_bytes(self, offset, length):
-            return self._edid[offset : offset+length]
-    else:
-        def _get_bytes(self, offset, length):
-            return bytearray(self._edid[offset : offset+length])
+    def _get_bytes(self, offset, length):
+        return self._edid[offset : offset+length]
 
     @property
     def fixed_header(self):
