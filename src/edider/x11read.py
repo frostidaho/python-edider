@@ -173,7 +173,7 @@ class Monitor(BaseMonitor):
         return Geometry(x, y, width, height)
 
     def __str__(self):
-        sstr = super().__str__()
+        sstr = super(Monitor, self).__str__()
         sstr += '\t->\t{}x{}'.format(self.width_in_pixels, self.height_in_pixels)
         return sstr
 
