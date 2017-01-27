@@ -143,6 +143,10 @@ class Monitor(BaseMonitor):
         return self._xout.output_name
 
     @property
+    def x11_output_id(self):
+        return self._xout.idx
+
+    @property
     def status(self):
         crtc = self._xout.crtc
         if crtc.idx == 0:
