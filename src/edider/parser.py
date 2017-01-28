@@ -210,7 +210,9 @@ class BaseMonitor(object):
         return self._uuid
 
     def __eq__(self, other):
-        return self.edid == other.edid
+        if hasattr(other, 'edid'):
+            return self.edid == other.edid
+        return False
         
     def _get_output_edid(self):
         raise NotImplementedError
