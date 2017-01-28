@@ -208,8 +208,10 @@ class BaseMonitor(object):
         md5 = hashlib.md5(self.edid).hexdigest()
         self._uuid = uuid.UUID(hex=md5)
         return self._uuid
-        
 
+    def __eq__(self, other):
+        return self.edid == other.edid
+        
     def _get_output_edid(self):
         raise NotImplementedError
 
