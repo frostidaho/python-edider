@@ -294,6 +294,16 @@ class BaseMonitor(object):
         except IndexError:
             return ''
 
+    def as_dict(self):
+        import inspect
+        fields = []
+        for name, obj in inspect.getmembers(self.__class__):
+            if (not name.startswith('_')) and inspect.isdatadescriptor(obj):
+                fields.append(name)
+        d = {}
+        for key in fields:
+            d[key] = getattr(self, key)
+        return d
 
     def __repr__(self):
         cname = self.__class__.__name__
