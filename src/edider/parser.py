@@ -309,6 +309,9 @@ class BaseMonitor(object):
         cname = self.__class__.__name__
         return cname + '({})'.format(self._id)
 
+    def __hash__(self):
+        return hash(self.edid)
+
     def __str__(self):
         rstr = repr(self)
         if self.name:
