@@ -2,7 +2,8 @@
 Overview
 ========
 
-A library for reading and parsing Extended Display Identification Data.
+A library for reading and parsing Extended Display Identification Data (EDID).
+It supports python-3.x and python-2.7.
 
 * Free software: BSD license
 
